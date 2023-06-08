@@ -1,9 +1,9 @@
 ﻿using Assignments;
 internal class Program {
     public static void assignmentsInterface(List<Assignment> pendingAssignments, List<Assignment> completedAssignments) {
-        int validOption, validID;
+        int validOption, validID, validShowOption;
         Console.WriteLine("----INTERFAZ----");
-        Console.WriteLine("1-Mover tarea\n2-Buscar tarea");
+        Console.WriteLine("1-Mover tarea\n2-Buscar tarea\n3-Actualizar sumario\n4-Mostrar lista");
         string? option = Console.ReadLine();
         while(!int.TryParse(option, out validOption)) {
             Console.WriteLine("\nIngresar una opcion valida");
@@ -28,6 +28,39 @@ internal class Program {
                 }
                 SearchAssignment(pendingAssignments, description);
                 break;
+            case 3:
+                int pendingDuration = 0, completedDuration = 0;
+                foreach(Assignment assignment in pendingAssignments) { pendingDuration += assignment.AssignmentDuration; }
+                foreach(Assignment assignment in completedAssignments) { completedDuration += assignment.AssignmentDuration; }
+                using (StreamWriter summary = new StreamWriter("Summary.txt")) {
+                    summary.WriteLine(completedDuration + pendingDuration);
+                }
+                break;
+            case 4:
+                Console.WriteLine("\nElegir lista a mostrar\n1-Pendientes\n2-Completas");
+                string? showOption = Console.ReadLine();
+                 while(!int.TryParse(showOption, out validShowOption)) {
+                    Console.WriteLine("\nIngresar una opcion valida");
+                    showOption = Console.ReadLine();
+                }
+                switch(validShowOption) {
+                    case 1:
+                        Console.WriteLine("\n---TAREAS PENDIENTES---\n");
+                        foreach(Assignment assignment in pendingAssignments) {
+                            assignment.DisplayData();
+                        }
+                        break;
+                    case 2:
+                        Console.WriteLine("\n---TAREAS COMPLETADAS---\n");
+                        foreach(Assignment assignment in completedAssignments) {
+                            assignment.DisplayData();
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("\nNo se encontro la lista\n");
+                        break;
+                }
+                break; 
             default:
                 Console.WriteLine("\nOpcion no encontrada\n");
                 break;
@@ -35,15 +68,11 @@ internal class Program {
     }
 
     public static void moveAssignment(List<Assignment> pendingAssignments, List<Assignment> completedAssignments, int id) {
-        Assignment choseAssignment;
-        foreach(Assignment assignment in pendingAssignments) {
-            if(assignment.AssignmentID == id) {
-                choseAssignment = assignment;
-                choseAssignment.AssignmentCompleted = true;
-                completedAssignments.Add(choseAssignment);
-                pendingAssignments.Remove(assignment);
-                return;
-            }
+        Assignment? choseAssignment = pendingAssignments.Find(assignment => assignment.AssignmentID == id);
+        if(!(choseAssignment == null) && pendingAssignments.Remove(choseAssignment)) {
+            choseAssignment.AssignmentCompleted = true;
+            completedAssignments.Add(choseAssignment);
+            return;
         }
         Console.WriteLine("\nNo se encontro la tarea especificada\n");
     }
@@ -67,7 +96,8 @@ internal class Program {
         for(int i = 0; i < maxAssignments; i++) {
             pendingAssignments.Add(new Assignment(i + 1, descriptions[i], (new Random()).Next(10, 101), false));
         }
-        assignmentsInterface(pendingAssignments, completedAssignments);
+        do {
+            assignmentsInterface(pendingAssignments, completedAssignments);
+        } while(Console.ReadKey().Key != ConsoleKey.Escape);
     }
-
 }

@@ -8,6 +8,7 @@ namespace Assignments {
         public string AssignmentDescription { get => assignmentDescription; }
         public int AssignmentID { get => assignmentID; }
         public bool AssignmentCompleted { get => assignmentCompleted; set => assignmentCompleted = value; }
+        public int AssignmentDuration { get => assignmentDuration; }
         public Assignment(int id, string description, int duration, bool state) {
             this.assignmentID = id;
             this.assignmentDescription = description;
